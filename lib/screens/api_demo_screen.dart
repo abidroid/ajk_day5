@@ -13,8 +13,13 @@ class ApiDemoScreen extends StatefulWidget {
 class _ApiDemoScreenState extends State<ApiDemoScreen> {
   // Initial State
   String quote = 'Quote';
+  bool isLoading = false;
 
   Future<void> getRandomQuote() async {
+
+    setState(() {
+      isLoading = true;
+    });
     String url = "https://dummyjson.com/quotes/random";
 
     // 1. send request to server
@@ -22,19 +27,19 @@ class _ApiDemoScreenState extends State<ApiDemoScreen> {
     http.Response response = await http.get(Uri.parse(url));
 
     // 3. check status code
-    if( response.statusCode == 200 ){
+    if (response.statusCode == 200) {
       // 4. if status code is 200
       // 5. means we got response
 
       var jsonResponse = jsonDecode(response.body);
 
-      quote  = jsonResponse['quote'];
-      setState(() {
-
-      });
+      quote = jsonResponse['quote'];
+      setState(() {});
     }
 
-
+    setState(() {
+      isLoading = false;
+    });
     // 6. we need to extract quote from the response
   }
 
@@ -45,16 +50,23 @@ class _ApiDemoScreenState extends State<ApiDemoScreen> {
         title: const Text('API Demo Screen'),
         backgroundColor: Colors.green,
       ),
-      body: ListView(
+      body: Column(
+        spacing: 16,
         children: [
-          ElevatedButton(onPressed: () {
-            getRandomQuote();
-          }, child: const Text("GET QUOTE",
+          ElevatedButton(
+            onPressed: () {
+              getRandomQuote();
+            },
+            child: const Text("GET QUOTE"),
+          ),
 
-          )),
-          Text(quote,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 30)),
+          isLoading
+              ? CircularProgressIndicator()
+              : Text(
+                quote,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 30),
+              ),
         ],
       ),
     );
